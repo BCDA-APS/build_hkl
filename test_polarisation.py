@@ -7,6 +7,9 @@ import unittest
 
 from collections import namedtuple
 from gi.repository import GLib
+from gi.repository import GLib
+import gi
+gi.require_version("Hkl", "5.0")
 from gi.repository import Hkl
 from numpy import (array, cross, dot, empty, hstack, reshape, vstack)
 from numpy.linalg import inv, norm
@@ -230,14 +233,14 @@ class Polarisation(unittest.TestCase):
         # RUBh = kf - ki = (P ki - ki) = (P - I) ki
 
         config = parse(find('crystal.ini'), dtype)
-        print config
+        print(config)
 
         gaga = ca(config, [0.5, 14.5, 0.43])
-        print gaga
+        print(gaga)
 
         UB = get_UB(config)
-        print "UB: "
-        print UB
+        print("UB: ")
+        print(UB)
 
         # the hkl vectors a*, b*, c* expressed in the laboratory basis for the current Q
         # transformation matrix T reciprocal space --> laboratory
@@ -252,13 +255,13 @@ class Polarisation(unittest.TestCase):
         values_w = [0, 51.48568, 84.79259, 0, 0, 89.37964]  # mu, omega, chi, phi, gamma, delta
 
         R, P = get_R_and_P(config, values_w)
-        print "R: "
-        print R
-        print "P: "
-        print P
+        print("R: ")
+        print(R)
+        print("P: ")
+        print(P)
         RUB = dot(R, UB)
-        print "RUB: "
-        print RUB
+        print("RUB: ")
+        print(RUB)
 
         astar = dot(RUB, [1, 0, 0])
         bstar = dot(RUB, [0, 1, 0])
@@ -274,7 +277,7 @@ class Polarisation(unittest.TestCase):
         # transformation matrix: laboratory --> reciprocal space
         Tinv = inv(T)
 
-        print ''
+        print('')
         # print 'cstar in laboratory frame       :',cstar
         # print 'cstar in laboratory frame from T:',dot(T, hkl)
         # print 'cstar in rec. space from Tinv   :',dot(Tinv, dot(T, hkl))
@@ -286,22 +289,22 @@ class Polarisation(unittest.TestCase):
         # compute Q
         Q = kf - ki
 
-        print ''
-        print 'Energy (keV):', config.source
-        print 'Lattice parameters:', config.sample.lattice
-        print '1st orienting reflection:', config.sample.or0.hkl, 'with angles: ', config.sample.or0.values
-        print '2nd orienting reflection:', config.sample.or1.hkl, 'with angles: ', config.sample.or1.values
-        print ''
+        print('')
+        print('Energy (keV):', config.source)
+        print('Lattice parameters:', config.sample.lattice)
+        print('1st orienting reflection:', config.sample.or0.hkl, 'with angles: ', config.sample.or0.values)
+        print('2nd orienting reflection:', config.sample.or1.hkl, 'with angles: ', config.sample.or1.values)
+        print('')
 
-        print 'UB matrix:'
-        print UB
-        print ''
-        print 'Transformation matrix T(reciprocal space)--> laboratory frame:'
-        print T,
-        print ''
-        print ''
-        print 'Transformation matrix T(laboratory frame)--> reciprocal space :'
-        print Tinv
+        print('UB matrix:')
+        print(UB)
+        print('')
+        print('Transformation matrix T(reciprocal space)--> laboratory frame:')
+        print(T,)
+        print('')
+        print('')
+        print('Transformation matrix T(laboratory frame)--> reciprocal space :')
+        print(Tinv)
 
         # compute Q
         # hkl = [0.5, 6.5, 0.43]
@@ -314,7 +317,7 @@ class Polarisation(unittest.TestCase):
         # hkl = [0.5, 13.5, 0.43]
         hkl = [0.5, 14.5, 0.43]
 
-	'''
+        '''
         print ''
         print 'Q in lab. frame from code   :', dot(dot(R, UB), hkl), ', normalized:',(dot(dot(R, UB), hkl))/norm(dot(dot(R, UB), hkl)), ', norm:', norm(dot(dot(R, UB), hkl))
         print 'Q in lab. frame from T      :', dot(T, hkl), ', normalized:', (dot(T, hkl))/norm(dot(T, hkl)), ', norm:', norm(dot(T, hkl))
@@ -327,9 +330,9 @@ class Polarisation(unittest.TestCase):
         print 'kf',kf,', norm:',norm(kf)
         print 'ki',ki,', norm:',norm(ki)
         '''
-        print ''
-        print 'Q in rec. space from Tinv of T   :', dot(Tinv, dot(T, hkl))
-        print ''
+        print('')
+        print('Q in rec. space from Tinv of T   :', dot(Tinv, dot(T, hkl)))
+        print('')
         #
         # compute u1, u2, u3 in reciprocal space coordinates
         # u1,u2,u3 in laboratory frame
@@ -344,15 +347,15 @@ class Polarisation(unittest.TestCase):
         u1 = dot(Tinv, u1xyz)
         u2 = dot(Tinv, u2xyz)
         u3 = dot(Tinv, u3xyz)
-        print '(u1,u2,u3) in reciprocal space from Tinv, unnormalized:',\
-            u1, u2, u3
-        print '(u1,u2,u3) in reciprocal space from Tinv, normalized to 1:',\
+        print('(u1,u2,u3) in reciprocal space from Tinv, unnormalized:',\
+            u1, u2, u3)
+        print('(u1,u2,u3) in reciprocal space from Tinv, normalized to 1:',\
             dot(Tinv, u1xyz) / norm(dot(Tinv, u1xyz)), \
             dot(Tinv, u2xyz) / norm(dot(Tinv, u2xyz)), \
-            dot(Tinv, u3xyz) / norm(dot(Tinv, u3xyz))
+            dot(Tinv, u3xyz) / norm(dot(Tinv, u3xyz)))
         # print '(u1,u2,u3) in reciprocal space from Tinv:', \
         #    dot(Tinv, u1xyz), dot(Tinv, u2xyz), dot(Tinv, u3xyz)
-        print ''
+        print('')
         # TRANSFORMATION MATRIX reciprocal lattice basis to u1 u2 u3 basis
         ABC = hstack((reshape([1, 0, 0], (3, 1)),
                       reshape([0, 1, 0], (3, 1)),
@@ -361,8 +364,8 @@ class Polarisation(unittest.TestCase):
                     reshape(u2, (3, 1)),
                     reshape(u3, (3, 1))))
         M = dot(ABC, inv(U))
-        print 'Transformation matrix reciprocal lattice basis to u1 u2 u3 basis:'
-        print M
+        print('Transformation matrix reciprocal lattice basis to u1 u2 u3 basis:')
+        print(M)
 
         # keep in order to pass the test
         self.assertTrue(True)
