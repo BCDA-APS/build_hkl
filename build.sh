@@ -37,6 +37,10 @@ TAR=tar
 WGET=wget
 
 build() {
+    ${ECHO} "${ARG1}"
+}
+
+download() {
 	${MKDIR} -p ${BUILD_DIR}
 
 	${ECHO} "Downloading gtk-doc in ${BUILD_DIR}"
@@ -60,57 +64,6 @@ build() {
 	
 	${ECHO} "Directory of ${BUILD_DIR}"
 	${LS} -lAFgh ${BUILD_DIR}
-}
-
-# TODO: replace with better
-contains() {
-	_source=$1
-	_item=$2
-	contains_result=0
-	IFS=':'
-	for _s in $_source; do
-		if [ "$_item" == "$_s" ] ; then
-			contains_result=${contains_result} + 1
-		fi
-	done
-	unset IFS
-	unset _source
-	unset _item
-}
-
-# TODO: replace with better
-append_or_define_path() {
-	target=$1
-	entry=$2
-	if [ "" == "${target}" ] ; then
-		append_or_define_path_result=${entry}
-	elif [ "" == "${entry}" ] ; then
-		append_or_define_path_result=${target}
-	else
-		append_or_define_path_result=${target}:${entry}
-	fi
-	# echo "append_or_define_path_result: $append_or_define_path_result"
-}
-
-# FIXME: stops appending after two items, replace with better
-strip_item_from_path() {
-	_item=$1
-	IFS=':'
-	_new_path=
-	for _s in $PATH; do
-		#echo "examining: $_s"
-		if [[ "$_s" != *"$_item"* ]] ; then
-			append_or_define_path ${_new_path} ${_s}
-			_new_path=${append_or_define_path_result}
-		fi
-		# echo "---------------"
-	done
-	unset IFS
-	#echo "_new_path : $_new_path"
-}
-
-download() {
-    ${ECHO} "${ARG1}"
 }
 
 info() {
@@ -172,6 +125,55 @@ setup() {
 
 	# GI_TYPELIB_PATH needed by Python clients to find .typelib file(s)
 	export GI_TYPELIB_PATH=${PREFIX_DIR}/lib/girepository-1.0:${GI_DIR_OS}
+}
+
+####################################################################
+
+# TODO: replace with better
+contains() {
+	_source=$1
+	_item=$2
+	contains_result=0
+	IFS=':'
+	for _s in $_source; do
+		if [ "$_item" == "$_s" ] ; then
+			contains_result=${contains_result} + 1
+		fi
+	done
+	unset IFS
+	unset _source
+	unset _item
+}
+
+# TODO: replace with better
+append_or_define_path() {
+	target=$1
+	entry=$2
+	if [ "" == "${target}" ] ; then
+		append_or_define_path_result=${entry}
+	elif [ "" == "${entry}" ] ; then
+		append_or_define_path_result=${target}
+	else
+		append_or_define_path_result=${target}:${entry}
+	fi
+	# echo "append_or_define_path_result: $append_or_define_path_result"
+}
+
+# FIXME: stops appending after two items, replace with better
+strip_item_from_path() {
+	_item=$1
+	IFS=':'
+	_new_path=
+	for _s in $PATH; do
+		#echo "examining: $_s"
+		if [[ "$_s" != *"$_item"* ]] ; then
+			append_or_define_path ${_new_path} ${_s}
+			_new_path=${append_or_define_path_result}
+		fi
+		# echo "---------------"
+	done
+	unset IFS
+	#echo "_new_path : $_new_path"
 }
 
 tests() {
