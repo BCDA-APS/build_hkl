@@ -1,0 +1,60 @@
+Building hkl from source
+========================
+
+Pre-requisites
+--------------
+
+	gtk-doc >= 1.9 (all -- required)		http://www.gtk.org/gtk-doc/
+	gsl >= 1.12    (lib -- required)		http://www.gnu.org/software/gsl/
+	gtkmm >= 2.18  (gui -- optional)		http://www.gtkmm.org
+	libg3d	       (gui -- optional)		http://automagically.de/g3dviewer/
+	libyaml	       (gui -- optional)		http://pyyaml.org/wiki/LibYAML
+	povray	       (doc -- optional)		http://www.povray.org/
+	asymptote      (doc -- optional)		http://asymptote.sourceforge.net/
+
+gtk-doc
+~~~~~~~~~
+
+provides gtkdocize (needed by autogen.sh)
+
+bison
+-----
+
+required by gobject-introspection
+
+
+GLib
+------
+
+v2.58.0+ required by latest gobject-introspection
+so find an earlier version of gobject-introspection (can't change GLib)
+
+
+gobject-introspection
+---------------------
+
+Where do I get these?
+	from gi.repository import GLib
+	from gi.repository import Hkl
+gi.repository is the Python module for PyGObject (which stands for Python GObject introspection)
+
+see https://gi.readthedocs.io/en/latest/
+
+
+
+Build steps for hkl
+-------------------
+
+	git clone https://github.com/picca/hkl
+	cd hkl
+
+	echo "`date` bash autogen.sh"                          | tee makelog.txt
+	bash autogen.sh                                   2>&1 | tee -a makelog.txt
+	echo "`date` ./configure"                              | tee -a makelog.txt
+	./configure  --disable-gui --prefix=${EXTRA_PKGS} 2>&1 | tee -a makelog.txt
+	echo "`date` make"                                     | tee -a makelog.txt
+	logmake &
+	tail -f makelog.txt
+
+Build steps for hkl Python binding
+----------------------------------
