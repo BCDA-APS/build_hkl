@@ -47,7 +47,8 @@ NODE_NAME=`uname -n`
 # configure as needed below
 
 export PATH=${PATH}:${PREFIX_DIR}/bin
-# TODO: export LD_LIBRARY_PATH=${PREFIX_DIR}/lib:${LD_LIBRARY_PATH}
+# TODO: assumes already defined, check first
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PREFIX_DIR}/lib
 export LDFLAGS=-L${PREFIX_DIR}/lib
 
 # gobject-inspection environment variables
