@@ -234,6 +234,8 @@ git checkout -b next origin/next
 ```
 
 today's system package installs (only a few were needed)
+
+```
 2019-07-16 09:49:08 install libpangox-1.0-0:amd64 <none> 0.0.2-5
 2019-07-16 09:49:08 install libgsf-1-common:all <none> 1.14.41-2
 2019-07-16 09:49:08 install libgsf-1-114:amd64 <none> 1.14.41-2
@@ -299,3 +301,4 @@ today's system package installs (only a few were needed)
 2019-07-16 16:10:55 install libxkbcommon-dev:amd64 <none> 0.8.0-1ubuntu0.1
 2019-07-16 16:10:55 install libgtk-3-dev:amd64 <none> 3.22.30-1ubuntu3
 2019-07-16 17:26:49 install gobject-introspection:amd64 <none> 1.56.1-1
+```
