@@ -46,12 +46,14 @@ build() {
     ${CD} ${BUILD_DIR}/gtk-doc
     ${BASH} autogen.sh 2>&1 | ${TEE} autogen.log
     ./configure --prefix=${PREFIX_DIR} 2>&1 | ${TEE} configure.log
+    exit_if_no_Makefile
     ${MAKE} 2>&1 | ${TEE}  make.log
     ${MAKE} install 2>&1 | ${TEE}  install.log
 
     # build gsl
     ${CD} ${BUILD_DIR}/gsl-2.5
     ./configure --prefix=${PREFIX_DIR} 2>&1 | ${TEE} configure.log
+    exit_if_no_Makefile
     ${MAKE} 2>&1 | ${TEE}  make.log
     ${MAKE} install 2>&1 | ${TEE}  install.log
 
@@ -59,6 +61,7 @@ build() {
     ${CD} ${BUILD_DIR}/gobject-introspection
     ${BASH} ./autogen.sh 2>&1 | ${TEE} autogen.log
     ./configure --prefix=${PREFIX_DIR} 2>&1 | ${TEE} configure.log
+    exit_if_no_Makefile
     ${MAKE} 2>&1 | ${TEE}  make.log
     ${MAKE} install 2>&1 | ${TEE}  install.log
 
@@ -67,6 +70,7 @@ build() {
     ${BASH} ./autogen.sh 2>&1 | ${TEE} autogen.log
     ./configure --prefix=${PREFIX_DIR}  --disable-hkl-doc 2>&1 | ${TEE} configure.log
     check_gobject_introspection
+    exit_if_no_Makefile
     ${MAKE} 2>&1 | ${TEE}  make.log
     ${MAKE} install 2>&1 | ${TEE}  install.log
 }
@@ -76,15 +80,28 @@ download() {
 
     ${ECHO} "Downloading gtk-doc in ${BUILD_DIR}"
     ${CD} ${BUILD_DIR}
+    if [ -e gtk-doc ]; then
+		${ECHO} "ERROR: ${BUILD_DIR}/gtk-doc exists"
+		exit 1
+    fi
     ${GIT} clone https://gitlab.gnome.org/GNOME/gtk-doc.git
 
     ${ECHO} "Downloading gsl in ${BUILD_DIR}"
     ${CD} ${BUILD_DIR}
+    # TODO: *learn: the directory's name
+    if [ -e gsl-2.5 ]; then
+		${ECHO} "ERROR: ${BUILD_DIR}/gsl-2.5 exists"
+		exit 1
+    fi
     ${WGET} http://gnu.mirrors.pair.com/gsl/gsl-latest.tar.gz
     ${TAR} xzf gsl-latest.tar.gz
 
     ${ECHO} "Downloading gobject-introspection in ${BUILD_DIR}"
     ${CD} ${BUILD_DIR}
+    if [ -e gobject-introspection ]; then
+		${ECHO} "ERROR: ${BUILD_DIR}/gobject-introspection exists"
+		exit 1
+    fi
     ${GIT} clone https://gitlab.gnome.org/GNOME/gobject-introspection.git
     ${CD} gobject-introspection
     # autogen.sh was removed after this tag
@@ -99,6 +116,10 @@ download() {
 
     ${ECHO} "Downloading hkl in ${BUILD_DIR}"
     ${CD} ${BUILD_DIR}
+    if [ -e hkl ]; then
+		${ECHO} "ERROR: ${BUILD_DIR}/hkl exists"
+		exit 1
+    fi
     ${GIT} clone git://repo.or.cz/hkl.git
     ${CD} hkl
     ${ECHO} "git checkout branch 'next' of gobject-introspection"
@@ -140,19 +161,27 @@ reset() {
 
     # reset gtk-doc
     ${CD} ${BUILD_DIR}/gtk-doc
-    ${MAKE} distclean
+    if [ -e ./Makefile ]; then
+        ${MAKE} distclean
+    fi
 
     # reset gsl
     ${CD} ${BUILD_DIR}/gsl-2.5
-    ${MAKE} distclean
+    if [ -e ./Makefile ]; then
+        ${MAKE} distclean
+    fi
 
     # gobject-introspection
     ${CD} ${BUILD_DIR}/gobject-introspection
-    ${MAKE} distclean
+    if [ -e ./Makefile ]; then
+        ${MAKE} distclean
+    fi
 
     # reset hkl
     ${CD} ${BUILD_DIR}/hkl
-    ${MAKE} distclean
+    if [ -e ./Makefile ]; then
+        ${MAKE} distclean
+    fi
 }
 
 setup() {
@@ -191,46 +220,78 @@ setup() {
 
 ####################################################################
 
+exit_if_no_Makefile() {
+    if [ ! -e ./Makefile ]; then
+        ${ECHO} "No Makefile in `pwd`"
+        exit 1
+    fi
+}
+
 check_gobject_introspection() {
-	# report and exit if problem
+    # report and exit if problem
 
-	# Problem occurs when we try to find gobject-introspection
-	# The system provides one version, Anaconda another
-	# Detect this *after* the configure step during the build.
-	# if problem: configure.log contains this message: 
-	#    checking for gobject-introspection... no
-	# if no problem: configure.log contains this message: 
-	#    checking for gobject-introspection... yes
-	
-	if [ -e ${BUILD_DIR}/hkl/configure.log ]; then
-	    match="checking for gobject-introspection"
-	    check_gobject_introspection_check=`${GREP} "${match}" ${BUILD_DIR}/hkl/configure.log`
-	    echo "match = |$match|"
-	    echo "check = |$check_gobject_introspection_check|"
-	fi
+    # Problem occurs when we try to find gobject-introspection
+    # The system provides one version, Anaconda another
+    # Detect this *after* the configure step during the build.
+    # if problem: configure.log contains this message: 
+    #    checking for gobject-introspection... no
+    # if no problem: configure.log contains this message: 
+    #    checking for gobject-introspection... yes
+    
+    if [ -e ${BUILD_DIR}/hkl/configure.log ]; then
+        match="checking for gobject-introspection"
+        check_gobject_introspection_check=`${GREP} "${match}" ${BUILD_DIR}/hkl/configure.log`
+        echo "match = |$match|"
+        echo "check = |$check_gobject_introspection_check|"
+    fi
 
-	if [[ ${check_gobject_introspection_check} == *"... no" ]]; then
-		${ECHO} "ERROR: gobject-introspection package not found during configure step"
-		${ECHO} "  '${check_gobject_introspection_check}'"
-		${ECHO} "  For more details, examine these files:"
-		${ECHO} "    - ${BUILD_DIR}/hkl/configure.log"
-		${ECHO} "    - ${BUILD_DIR}/hkl/config.log"
-		${ECHO} "  Are there conflicting 'gobject-introspection-1.0.pc' file on your systems?"
-		${ECHO} "  In each, check the 'Version:' line"
-		${ECHO} "  (Hint: try removing Anaconda Python from PATH)"
-		${EXIT} 1
-	fi
+    if [[ ${check_gobject_introspection_check} == *"... no" ]]; then
+        ${ECHO} "ERROR: gobject-introspection package not found during configure step"
+        ${ECHO} "  '${check_gobject_introspection_check}'"
+        ${ECHO} "  For more details, examine these files:"
+        ${ECHO} "    - ${BUILD_DIR}/hkl/configure.log"
+        ${ECHO} "    - ${BUILD_DIR}/hkl/config.log"
+        ${ECHO} "  Are there conflicting 'gobject-introspection-1.0.pc' file on your systems?"
+        ${ECHO} "  In each, check the 'Version:' line"
+        ${ECHO} "  (Hint: try removing Anaconda Python from PATH)"
+        ${EXIT} 1
+    fi
+}
+
+contains() {
+    # return 0 if path $source does not contain $item
+    source=$1
+    item=$2
+    contains_result=0
+    if [[ ${source} == "${item}:"* ]]; then
+        # at the start
+        contains_result=1
+    elif [[ ${source} == *":${item}" ]]; then
+        # at the end
+        contains_result=3
+    elif [[ ${source} == *":${item}:"* ]]; then
+        # in the middle
+        contains_result=2
+    fi
+    echo "contains: ${item} -- ${contains_result}"
 }
 
 # TODO: replace with better
 append_or_define_path() {
     target=$1
     entry=$2
-    if [ "" == "${target}" ] ; then
+    contains ${target} ${entry}
+    if [ ${contains_result} != 0 ]; then
+        # already defined, keep list
+        append_or_define_path_result=${target}
+    elif [ "" == "${target}" ] ; then
+        # empty target, create list
         append_or_define_path_result=${entry}
     elif [ "" == "${entry}" ] ; then
+        # empty entry, keep list
         append_or_define_path_result=${target}
     else
+        # append to list
         append_or_define_path_result=${target}:${entry}
     fi
     # echo "append_or_define_path_result: $append_or_define_path_result"
@@ -251,7 +312,10 @@ developer() {
     #  echo "/no/such/path/: yes"
     #fi
 
-    check_gobject_introspection
+    contains /bin:/usr/local/bin:/tmp /boot
+    contains /bin:/usr/local/bin:/tmp /bin
+    contains /bin:/usr/local/bin:/tmp /usr/local/bin
+    contains /bin:/usr/local/bin:/tmp /tmp
 
 }
 
