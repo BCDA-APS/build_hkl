@@ -185,13 +185,12 @@ info() {
     # ${ECHO} "GIT:             ${GIT}"
     ${ECHO} "GI_TYPELIB_PATH: ${GI_TYPELIB_PATH}"
     ${ECHO} "ID:              ${ID}"
-    ${ECHO} "IS_MINT:         ${IS_MINT}"
-    ${ECHO} "IS_RHEL:         ${IS_RHEL}"
     ${ECHO} "LDFLAGS:         ${LDFLAGS}"
     ${ECHO} "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
     # ${ECHO} "MAKE:            ${MAKE}"
     # ${ECHO} "MKDIR:           ${MKDIR}"
     ${ECHO} "OS:              ${OS}"
+    ${ECHO} "OS_RELEASE_NAME: ${OS_RELEASE_NAME}"
     ${ECHO} "PKG_CONFIG_PATH: ${PKG_CONFIG_PATH}"
     ${ECHO} "PREFIX_DIR:      ${PREFIX_DIR}"
     ${ECHO} "SCRIPT_NAME:     ${SCRIPT_NAME}"
@@ -205,12 +204,11 @@ setup() {
         ${ECHO} "ERROR: file /etc/os-release not found, What OS is this?"
         exit 1
     fi
-    IS_MINT=`${GREP} "^NAME=" /etc/os-release | ${GREP} "Linux Mint"`
-    IS_RHEL=`${GREP} "^NAME=" /etc/os-release | ${GREP} "Red Hat Enterprise Linux"`
-    if [ "" != "${IS_MINT}" ] ; then
+    OS_RELEASE_NAME=`${GREP} "^NAME=" /etc/os-release`
+    if [[ "${OS_RELEASE_NAME}" == *"Linux Mint" ]] ; then
         export OS=Mint
         export GI_DIR_OS=/usr/lib/x86_64-linux-gnu/girepository-1.0
-    elif [ "" != "${IS_RHEL}" ] ; then
+    elif [[ "${OS_RELEASE_NAME}" == *"Red Hat Enterprise Linux"* ]] ; then
         export OS=RHEL
         export GI_DIR_OS=/usr/lib/girepository-1.0
     else
