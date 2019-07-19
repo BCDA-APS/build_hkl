@@ -186,7 +186,7 @@ info() {
     ${ECHO} "GI_TYPELIB_PATH: ${GI_TYPELIB_PATH}"
     ${ECHO} "ID:              ${ID}"
     ${ECHO} "IS_MINT:         ${IS_MINT}"
-    ${ECHO} "IS_RHEL7:        ${IS_RHEL7}"
+    ${ECHO} "IS_RHEL:         ${IS_RHEL}"
     ${ECHO} "LDFLAGS:         ${LDFLAGS}"
     ${ECHO} "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
     # ${ECHO} "MAKE:            ${MAKE}"
@@ -201,6 +201,7 @@ info() {
 
 setup() {
     if [ ! -e /etc/os-release ] ; then
+        # RHEL6 does not have this file
         ${ECHO} "ERROR: file /etc/os-release not found, What OS is this?"
         exit 1
     fi
@@ -210,7 +211,7 @@ setup() {
         export OS=Mint
         export GI_DIR_OS=/usr/lib/x86_64-linux-gnu/girepository-1.0
     elif [ "" != "${IS_RHEL}" ] ; then
-        export OS=Mint
+        export OS=RHEL
         export GI_DIR_OS=/usr/lib/girepository-1.0
     else
         export OS=
