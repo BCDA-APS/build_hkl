@@ -7,6 +7,9 @@
 export PREFIX_DIR=${HOME}/Apps/hkl-5
 export BUILD_DIR=/tmp/hkl_source_build
 
+# build with a very primitive PATH
+export PATH=/usr/local/bin:/bin:/usr/bin:/usr/sbin:/sbin
+
 ####################################################################
 # build these packages in BUILD_DIR
 # install them in PREFIX_DIR
