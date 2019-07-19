@@ -28,10 +28,8 @@ BASH=bash
 CD=cd
 CHMOD=chmod
 ECHO=echo
-EXIT=exit
 GIT=git
 GREP=grep
-ID=id
 LS=ls
 MAKE=make
 MKDIR=mkdir
@@ -182,7 +180,6 @@ info() {
     ${ECHO} "GI_DIR_OS:       ${GI_DIR_OS}"
     # ${ECHO} "GIT:             ${GIT}"
     ${ECHO} "GI_TYPELIB_PATH: ${GI_TYPELIB_PATH}"
-    ${ECHO} "ID:              ${ID}"
     ${ECHO} "LDFLAGS:         ${LDFLAGS}"
     ${ECHO} "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
     # ${ECHO} "MAKE:            ${MAKE}"
@@ -270,7 +267,7 @@ check_gobject_introspection() {
         ${ECHO} "  Are there conflicting 'gobject-introspection-1.0.pc' file on your system?"
         ${ECHO} "  In each, check the 'Version:' line"
         ${ECHO} "  (Hint: try removing Anaconda Python from PATH)"
-        ${EXIT} 1
+        exit 1
     fi
 }
 
@@ -290,7 +287,7 @@ check_xmlcatalog_found() {
         ${ECHO} "    - ${BUILD_DIR}/gtk-doc/autogen.log"
         ${ECHO} "  Debian: Is the libxml2-utils package installed on your system?"
         ${ECHO} "  RHEL: Is the libxml2 package installed on your system?"
-        ${EXIT} 1
+        exit 1
     fi
 }
 
