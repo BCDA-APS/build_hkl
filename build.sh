@@ -200,6 +200,10 @@ info() {
 }
 
 setup() {
+    if [ -d /etc/os-release ] ; then
+        ${ECHO} "ERROR: file /etc/os-release not found, What OS is this?"
+        exit 1
+    fi
     IS_MINT=`${GREP} "^NAME=" /etc/os-release | ${GREP} "Linux Mint"`
     IS_RHEL=`${GREP} "^NAME=" /etc/os-release | ${GREP} "Red Hat Enterprise Linux"`
     if [ "" != "${IS_MINT}" ] ; then
