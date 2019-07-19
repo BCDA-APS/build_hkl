@@ -3,8 +3,8 @@
 # build the hkl package from source
 
 # must be absolute paths!
-#export PREFIX_DIR=/APSshare/linux/64/hkl
-export PREFIX_DIR=${HOME}/hkl
+#export PREFIX_DIR=/APSshare/linux/64/hkl-5
+export PREFIX_DIR=${HOME}/Apps/hkl-5
 export BUILD_DIR=/tmp/hkl_source_build
 
 ####################################################################
