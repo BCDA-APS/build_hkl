@@ -27,6 +27,7 @@ DIRNAME=dirname
 ECHO=echo
 EXIT=exit
 GIT=git
+GREP=grep
 ID=id
 LS=ls
 MAKE=make
@@ -66,15 +67,6 @@ build() {
     ${BASH} ./autogen.sh 2>&1 | ${TEE} autogen.log
     ./configure --prefix=${PREFIX_DIR}  --disable-hkl-doc 2>&1 | ${TEE} configure.log
     check_gobject_introspection
-    if [ ${check_gobject_introspection_result} != 0 ]; then
-		${ECHO} "ERROR: gobject-introspection package not found during configure step"
-		${ECHO} "  For more details, examine these files:"
-		${ECHO} "    - ${BUILD_DIR}/hkl/configure.log"
-		${ECHO} "    - ${BUILD_DIR}/hkl/config.log"
-		${ECHO} "  Are there conflicting 'gobject-introspection-1.0.pc' files?"
-		${ECHO} "  (Hint: try removing Anaconda Python from PATH)"
-		${EXIT} 1
-    fi
     ${MAKE} 2>&1 | ${TEE}  make.log
     ${MAKE} install 2>&1 | ${TEE}  install.log
 }
@@ -164,8 +156,8 @@ reset() {
 }
 
 setup() {
-    IS_MINT=`grep "^NAME=" /etc/os-release | grep "Linux Mint"`
-    IS_RHEL=`grep "^NAME=" /etc/os-release | grep "Red Hat Enterprise Linux"`
+    IS_MINT=`${GREP} "^NAME=" /etc/os-release | ${GREP} "Linux Mint"`
+    IS_RHEL=`${GREP} "^NAME=" /etc/os-release | ${GREP} "Red Hat Enterprise Linux"`
     if [ "" != "${IS_MINT}" ] ; then
         export OS=Mint
         export GI_DIR_OS=/usr/lib/x86_64-linux-gnu/girepository-1.0
@@ -200,9 +192,7 @@ setup() {
 ####################################################################
 
 check_gobject_introspection() {
-	# set result to:
-	#    0 if no problem
-	#    1 if problem
+	# report and exit if problem
 
 	# Problem occurs when we try to find gobject-introspection
 	# The system provides one version, Anaconda another
@@ -211,23 +201,25 @@ check_gobject_introspection() {
 	#    checking for gobject-introspection... no
 	# if no problem: configure.log contains this message: 
 	#    checking for gobject-introspection... yes
-	check_gobject_introspection_result=1
-}
+	
+	if [ -e ${BUILD_DIR}/hkl/configure.log ]; then
+	    match="checking for gobject-introspection"
+	    check_gobject_introspection_check=`${GREP} "${match}" ${BUILD_DIR}/hkl/configure.log`
+	    echo "match = |$match|"
+	    echo "check = |$check_gobject_introspection_check|"
+	fi
 
-# TODO: replace with better
-contains() {
-    _source=$1
-    _item=$2
-    contains_result=0
-    IFS=':'
-    for _s in $_source; do
-        if [ "$_item" == "$_s" ] ; then
-            contains_result=${contains_result} + 1
-        fi
-    done
-    unset IFS
-    unset _source
-    unset _item
+	if [[ ${check_gobject_introspection_check} == *"... no" ]]; then
+		${ECHO} "ERROR: gobject-introspection package not found during configure step"
+		${ECHO} "  '${check_gobject_introspection_check}'"
+		${ECHO} "  For more details, examine these files:"
+		${ECHO} "    - ${BUILD_DIR}/hkl/configure.log"
+		${ECHO} "    - ${BUILD_DIR}/hkl/config.log"
+		${ECHO} "  Are there conflicting 'gobject-introspection-1.0.pc' file on your systems?"
+		${ECHO} "  In each, check the 'Version:' line"
+		${ECHO} "  (Hint: try removing Anaconda Python from PATH)"
+		${EXIT} 1
+	fi
 }
 
 # TODO: replace with better
@@ -260,15 +252,6 @@ developer() {
     #fi
 
     check_gobject_introspection
-    if [ ${check_gobject_introspection_result} != 0 ]; then
-		${ECHO} "ERROR: gobject-introspection package not found during configure step"
-		${ECHO} "  For more details, examine these files:"
-		${ECHO} "    - ${BUILD_DIR}/hkl/configure.log"
-		${ECHO} "    - ${BUILD_DIR}/hkl/config.log"
-		${ECHO} "  Are there conflicting 'gobject-introspection-1.0.pc' files?"
-		${ECHO} "  (Hint: try removing Anaconda Python from PATH)"
-		${EXIT} 1
-    fi
 
 }
 
@@ -294,7 +277,7 @@ case ${ARG1} in
     info
     ;;
 
-    developer)
+    dev | devel | developer)
     setup
     developer
     ;;
