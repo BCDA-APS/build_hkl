@@ -23,6 +23,7 @@ ARG1=$1
 BASENAME=basename
 BASH=bash
 CD=cd
+CHMOD=chmod
 DIRNAME=dirname
 ECHO=echo
 EXIT=exit
@@ -78,6 +79,10 @@ build() {
     exit_if_no_Makefile
     ${MAKE} 2>&1 | ${TEE}  make.log
     ${MAKE} install 2>&1 | ${TEE}  install.log
+
+    make_env_setup
+    ${ECHO} "Setup your bash environment with this command before running Python code"
+    ${ECHO} "   . ${PREFIX_DIR}/hkl_environment.sh "
 }
 
 download() {
@@ -355,6 +360,24 @@ developer() {
     append_or_define_path /start:/middle:/end /end/more
     append_or_define_path /start:/middle:/end /end/more
 
+    # make_env_setup
+
+}
+
+make_env_setup() {
+    _f=${PREFIX_DIR}/hkl_environment.sh
+    ${ECHO} "Creating environment setup in ${_f}"
+    
+    ${ECHO} "#!/bin/bash" > ${_f}
+    ${ECHO} "" >> ${_f}
+    ${ECHO} "# source this file to setup environment for hkl:" >> ${_f}
+    ${ECHO} "#    . ${_f}" >> ${_f}
+    ${ECHO} "" >> ${_f}
+    ${ECHO} "export PATH=\$PATH:${PREFIX_DIR}/bin" >> ${_f}
+    ${ECHO} "export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" >> ${_f}
+    ${ECHO} "export GI_TYPELIB_PATH=${GI_TYPELIB_PATH}" >> ${_f}
+    
+    ${CHMOD} +x ${_f}
 }
 
 usage() {
