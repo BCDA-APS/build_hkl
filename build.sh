@@ -34,17 +34,24 @@ MAKE=make
 MKDIR=mkdir
 PS=ps
 READLINK=readlink
+RM=rm
 SCRIPT_NAME=${BASH_SOURCE:-$0}
 TAR=tar
 TEE=tee
 WGET=wget
 
 build() {
+    if [ ! -d ${BUILD_DIR} ]; then
+        ${ECHO} "${BUILD_DIR} does not exist .. downloading first"
+        download
+    fi
+    
     ${ECHO} "Building in ${BUILD_DIR}, installing into ${PREFIX_DIR}"
 
     # build gtk-doc
     ${CD} ${BUILD_DIR}/gtk-doc
     ${BASH} autogen.sh 2>&1 | ${TEE} autogen.log
+    check_xmlcatalog_found
     ./configure --prefix=${PREFIX_DIR} 2>&1 | ${TEE} configure.log
     exit_if_no_Makefile
     ${MAKE} 2>&1 | ${TEE}  make.log
@@ -81,8 +88,8 @@ download() {
     ${ECHO} "Downloading gtk-doc in ${BUILD_DIR}"
     ${CD} ${BUILD_DIR}
     if [ -e gtk-doc ]; then
-		${ECHO} "ERROR: ${BUILD_DIR}/gtk-doc exists"
-		exit 1
+        ${ECHO} "ERROR: ${BUILD_DIR}/gtk-doc exists"
+        exit 1
     fi
     ${GIT} clone https://gitlab.gnome.org/GNOME/gtk-doc.git
 
@@ -90,8 +97,8 @@ download() {
     ${CD} ${BUILD_DIR}
     # TODO: *learn: the directory's name
     if [ -e gsl-2.5 ]; then
-		${ECHO} "ERROR: ${BUILD_DIR}/gsl-2.5 exists"
-		exit 1
+        ${ECHO} "ERROR: ${BUILD_DIR}/gsl-2.5 exists"
+        exit 1
     fi
     ${WGET} http://gnu.mirrors.pair.com/gsl/gsl-latest.tar.gz
     ${TAR} xzf gsl-latest.tar.gz
@@ -99,8 +106,8 @@ download() {
     ${ECHO} "Downloading gobject-introspection in ${BUILD_DIR}"
     ${CD} ${BUILD_DIR}
     if [ -e gobject-introspection ]; then
-		${ECHO} "ERROR: ${BUILD_DIR}/gobject-introspection exists"
-		exit 1
+        ${ECHO} "ERROR: ${BUILD_DIR}/gobject-introspection exists"
+        exit 1
     fi
     ${GIT} clone https://gitlab.gnome.org/GNOME/gobject-introspection.git
     ${CD} gobject-introspection
@@ -117,8 +124,8 @@ download() {
     ${ECHO} "Downloading hkl in ${BUILD_DIR}"
     ${CD} ${BUILD_DIR}
     if [ -e hkl ]; then
-		${ECHO} "ERROR: ${BUILD_DIR}/hkl exists"
-		exit 1
+        ${ECHO} "ERROR: ${BUILD_DIR}/hkl exists"
+        exit 1
     fi
     ${GIT} clone git://repo.or.cz/hkl.git
     ${CD} hkl
@@ -127,6 +134,38 @@ download() {
     
     ${ECHO} "Directory of ${BUILD_DIR}"
     ${LS} -lAFgh ${BUILD_DIR}
+}
+
+reset() {
+    ${ECHO} "resetting source directories to distclean state"
+
+    # reset gtk-doc
+    ${CD} ${BUILD_DIR}/gtk-doc
+    if [ -e ./Makefile ]; then
+        ${MAKE} distclean
+    fi
+    ${RM} -f *.log configure
+
+    # reset gsl
+    ${CD} ${BUILD_DIR}/gsl-2.5
+    if [ -e ./Makefile ]; then
+        ${MAKE} distclean
+    fi
+    ${RM} -f *.log
+
+    # gobject-introspection
+    ${CD} ${BUILD_DIR}/gobject-introspection
+    if [ -e ./Makefile ]; then
+        ${MAKE} distclean
+    fi
+    ${RM} -f *.log configure
+
+    # reset hkl
+    ${CD} ${BUILD_DIR}/hkl
+    if [ -e ./Makefile ]; then
+        ${MAKE} distclean
+    fi
+    ${RM} -f *.log configure
 }
 
 info() {
@@ -154,34 +193,6 @@ info() {
     ${ECHO} "SCRIPT_NAME:     ${SCRIPT_NAME}"
     ${ECHO} "TAR:             ${TAR}"
     ${ECHO} "WGET:            ${WGET}"
-}
-
-reset() {
-    ${ECHO} "resetting source directories to distclean state"
-
-    # reset gtk-doc
-    ${CD} ${BUILD_DIR}/gtk-doc
-    if [ -e ./Makefile ]; then
-        ${MAKE} distclean
-    fi
-
-    # reset gsl
-    ${CD} ${BUILD_DIR}/gsl-2.5
-    if [ -e ./Makefile ]; then
-        ${MAKE} distclean
-    fi
-
-    # gobject-introspection
-    ${CD} ${BUILD_DIR}/gobject-introspection
-    if [ -e ./Makefile ]; then
-        ${MAKE} distclean
-    fi
-
-    # reset hkl
-    ${CD} ${BUILD_DIR}/hkl
-    if [ -e ./Makefile ]; then
-        ${MAKE} distclean
-    fi
 }
 
 setup() {
@@ -240,22 +251,66 @@ check_gobject_introspection() {
     
     if [ -e ${BUILD_DIR}/hkl/configure.log ]; then
         match="checking for gobject-introspection"
-        check_gobject_introspection_check=`${GREP} "${match}" ${BUILD_DIR}/hkl/configure.log`
+        _result=`${GREP} "${match}" ${BUILD_DIR}/hkl/configure.log`
         echo "match = |$match|"
-        echo "check = |$check_gobject_introspection_check|"
+        echo "check = |$_result|"
     fi
 
-    if [[ ${check_gobject_introspection_check} == *"... no" ]]; then
+    if [[ ${_result} == *"... no" ]]; then
         ${ECHO} "ERROR: gobject-introspection package not found during configure step"
-        ${ECHO} "  '${check_gobject_introspection_check}'"
+        ${ECHO} "  '${_result}'"
         ${ECHO} "  For more details, examine these files:"
         ${ECHO} "    - ${BUILD_DIR}/hkl/configure.log"
         ${ECHO} "    - ${BUILD_DIR}/hkl/config.log"
-        ${ECHO} "  Are there conflicting 'gobject-introspection-1.0.pc' file on your systems?"
+        ${ECHO} "  Are there conflicting 'gobject-introspection-1.0.pc' file on your system?"
         ${ECHO} "  In each, check the 'Version:' line"
         ${ECHO} "  (Hint: try removing Anaconda Python from PATH)"
         ${EXIT} 1
     fi
+}
+
+check_xmlcatalog_found() {
+    # report and exit if problem
+    if [ -e ${BUILD_DIR}/gtk-doc/autogen.log ]; then
+        match="checking for xmlcatalog"
+        _result=`${GREP} "${match}" ${BUILD_DIR}/gtk-doc/autogen.log`
+        echo "match = |$match|"
+        echo "check = |$_result|"
+    fi
+
+    if [[ ${_result} == *"... no" ]]; then
+        ${ECHO} "ERROR: xmlcatalog not found during autogen.sh step"
+        ${ECHO} "  '${_result}'"
+        ${ECHO} "  For more details, examine this file:"
+        ${ECHO} "    - ${BUILD_DIR}/gtk-doc/autogen.log"
+        ${ECHO} "  Debian: Is the libxml2-utils package installed on your system?"
+        ${ECHO} "  RHEL: Is the libxml2 package installed on your system?"
+        ${EXIT} 1
+    fi
+}
+
+# TODO: replace with better
+append_or_define_path() {
+    _path=$1
+    entry=$2
+    contains ${_path} ${entry}
+    if [ ${contains_result} != 0 ]; then
+        # already defined, keep list
+        append_or_define_path_result=${_path}
+    elif [ "${entry}" == "${_path}" ] ; then
+        # same thing
+        append_or_define_path_result=${_path}
+    elif [ "" == "${_path}" ] ; then
+        # empty _path, create list
+        append_or_define_path_result=${entry}
+    elif [ "" == "${entry}" ] ; then
+        # empty entry, keep list
+        append_or_define_path_result=${_path}
+    else
+        # append to list
+        append_or_define_path_result=${_path}:${entry}
+    fi
+    # echo "append_or_define_path_result: $append_or_define_path_result"
 }
 
 contains() {
@@ -274,27 +329,6 @@ contains() {
         contains_result=2
     fi
     # echo "contains: ${item} -- ${contains_result}"
-}
-
-# TODO: replace with better
-append_or_define_path() {
-    target=$1
-    entry=$2
-    contains ${target} ${entry}
-    if [ ${contains_result} != 0 ]; then
-        # already defined, keep list
-        append_or_define_path_result=${target}
-    elif [ "" == "${target}" ] ; then
-        # empty target, create list
-        append_or_define_path_result=${entry}
-    elif [ "" == "${entry}" ] ; then
-        # empty entry, keep list
-        append_or_define_path_result=${target}
-    else
-        # append to list
-        append_or_define_path_result=${target}:${entry}
-    fi
-    # echo "append_or_define_path_result: $append_or_define_path_result"
 }
 
 developer() {
@@ -318,6 +352,7 @@ developer() {
     contains /bin:/usr/local/bin:/tmp /tmp
     
     append_or_define_path /start
+    append_or_define_path /start /start
     append_or_define_path /start:/middle:/end /start
     append_or_define_path /start:/middle:/end /middle
     append_or_define_path /start:/middle:/end /end
