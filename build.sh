@@ -273,7 +273,7 @@ contains() {
         # in the middle
         contains_result=2
     fi
-    echo "contains: ${item} -- ${contains_result}"
+    # echo "contains: ${item} -- ${contains_result}"
 }
 
 # TODO: replace with better
@@ -316,6 +316,13 @@ developer() {
     contains /bin:/usr/local/bin:/tmp /bin
     contains /bin:/usr/local/bin:/tmp /usr/local/bin
     contains /bin:/usr/local/bin:/tmp /tmp
+    
+    append_or_define_path /start
+    append_or_define_path /start:/middle:/end /start
+    append_or_define_path /start:/middle:/end /middle
+    append_or_define_path /start:/middle:/end /end
+    append_or_define_path /start:/middle:/end /end/more
+    append_or_define_path /start:/middle:/end /end/more
 
 }
 
