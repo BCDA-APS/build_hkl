@@ -200,7 +200,7 @@ info() {
 }
 
 setup() {
-    if [ -e /etc/os-release ] ; then
+    if [ ! -e /etc/os-release ] ; then
         ${ECHO} "ERROR: file /etc/os-release not found, What OS is this?"
         exit 1
     fi
