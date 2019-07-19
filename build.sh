@@ -27,7 +27,6 @@ BASENAME=basename
 BASH=bash
 CD=cd
 CHMOD=chmod
-DIRNAME=dirname
 ECHO=echo
 EXIT=exit
 GIT=git
@@ -179,7 +178,6 @@ info() {
     ${ECHO} "BASENAME:        ${BASENAME}"
     # ${ECHO} "BASH:            ${BASH}"
     ${ECHO} "BUILD_DIR:       ${BUILD_DIR}"
-    ${ECHO} "DIRNAME:         ${DIRNAME}"
     # ${ECHO} "ECHO:            ${ECHO}"
     ${ECHO} "GI_DIR_OS:       ${GI_DIR_OS}"
     # ${ECHO} "GIT:             ${GIT}"
@@ -205,7 +203,7 @@ setup() {
         exit 1
     fi
     OS_RELEASE_NAME=`${GREP} "^NAME=" /etc/os-release`
-    if [[ "${OS_RELEASE_NAME}" == *"Linux Mint" ]] ; then
+    if [[ "${OS_RELEASE_NAME}" == *"Linux Mint"* ]] ; then
         export OS=Mint
         export GI_DIR_OS=/usr/lib/x86_64-linux-gnu/girepository-1.0
     elif [[ "${OS_RELEASE_NAME}" == *"Red Hat Enterprise Linux"* ]] ; then
