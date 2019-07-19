@@ -80,6 +80,7 @@ build() {
     ${MAKE} 2>&1 | ${TEE}  make.log
     ${MAKE} install 2>&1 | ${TEE}  install.log
 
+    make_readme
     make_env_setup
     ${ECHO} "Setup your bash environment with this command before running Python code"
     ${ECHO} "   . ${PREFIX_DIR}/hkl_environment.sh "
@@ -366,7 +367,7 @@ developer() {
 
 make_env_setup() {
     _f=${PREFIX_DIR}/hkl_environment.sh
-    ${ECHO} "Creating environment setup in ${_f}"
+    ${ECHO} "Creating environment setup: ${_f}"
     
     ${ECHO} "#!/bin/bash" > ${_f}
     ${ECHO} "" >> ${_f}
@@ -378,6 +379,34 @@ make_env_setup() {
     ${ECHO} "export GI_TYPELIB_PATH=${GI_TYPELIB_PATH}" >> ${_f}
     
     ${CHMOD} +x ${_f}
+}
+
+make_readme() {
+    _f=${PREFIX_DIR}/README
+    ${ECHO} "Creating ${_f}"
+
+    ${ECHO} "# README" > ${_f}
+    ${ECHO} "" >> ${_f}
+    ${ECHO} "This directory contains a compiled version of *hkl*," >> ${_f}
+    ${ECHO} "the diffractometer computation library." >> ${_f}
+    ${ECHO} "" >> ${_f}
+    ${ECHO} "To use this library in Python, first source the" >> ${_f}
+    ${ECHO} "environment setup file:" >> ${_f}
+    ${ECHO} "" >> ${_f}
+    ${ECHO} "    . ${PREFIX_DIR}/hkl_environment.sh" >> ${_f}
+    ${ECHO} "" >> ${_f}
+    ${ECHO} "Your Python will need the *PyGObject* package installed." >> ${_f}
+    ${ECHO} "Your python code will need these imports:" >> ${_f}
+    ${ECHO} "" >> ${_f}
+    ${ECHO} "    from gi.repository import GLib" >> ${_f}
+    ${ECHO} "    import gi" >> ${_f}
+    ${ECHO} "    gi.require_version("Hkl", "5.0")" >> ${_f}
+    ${ECHO} "    from gi.repository import Hkl" >> ${_f}
+    ${ECHO} "" >> ${_f}
+    ${ECHO} "For more details, see:" >> ${_f}
+    ${ECHO} "" >> ${_f}
+    ${ECHO} "* docs: https://people.debian.org/~picca/hkl/hkl.html" >> ${_f}
+    ${ECHO} "* source: http://repo.or.cz/r/hkl.git " >> ${_f}
 }
 
 usage() {
