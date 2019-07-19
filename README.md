@@ -1,6 +1,6 @@
 # build_hkl
 
-This repository provides a tool (['build.sh`]())
+This repository provides a tool ([`build.sh`]())
 to download, build, install, and test the
 [*hkl*](https://people.debian.org/~picca/hkl/hkl.html) package 
 (source code: https://repo.or.cz/hkl.git).
