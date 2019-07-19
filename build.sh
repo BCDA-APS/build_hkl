@@ -173,7 +173,6 @@ reset() {
 
 info() {
     ${ECHO} "ARG1:            ${ARG1}"
-    ${ECHO} "BASENAME:        ${BASENAME}"
     # ${ECHO} "BASH:            ${BASH}"
     ${ECHO} "BUILD_DIR:       ${BUILD_DIR}"
     # ${ECHO} "ECHO:            ${ECHO}"
