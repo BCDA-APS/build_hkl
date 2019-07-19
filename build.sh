@@ -32,8 +32,6 @@ ID=id
 LS=ls
 MAKE=make
 MKDIR=mkdir
-PS=ps
-READLINK=readlink
 RM=rm
 SCRIPT_NAME=${BASH_SOURCE:-$0}
 TAR=tar
@@ -171,28 +169,26 @@ reset() {
 info() {
     ${ECHO} "ARG1:            ${ARG1}"
     ${ECHO} "BASENAME:        ${BASENAME}"
-    ${ECHO} "BASH:            ${BASH}"
+    # ${ECHO} "BASH:            ${BASH}"
     ${ECHO} "BUILD_DIR:       ${BUILD_DIR}"
     ${ECHO} "DIRNAME:         ${DIRNAME}"
-    ${ECHO} "ECHO:            ${ECHO}"
+    # ${ECHO} "ECHO:            ${ECHO}"
     ${ECHO} "GI_DIR_OS:       ${GI_DIR_OS}"
-    ${ECHO} "GIT:             ${GIT}"
+    # ${ECHO} "GIT:             ${GIT}"
     ${ECHO} "GI_TYPELIB_PATH: ${GI_TYPELIB_PATH}"
     ${ECHO} "ID:              ${ID}"
     ${ECHO} "IS_MINT:         ${IS_MINT}"
     ${ECHO} "IS_RHEL7:        ${IS_RHEL7}"
     ${ECHO} "LDFLAGS:         ${LDFLAGS}"
     ${ECHO} "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
-    ${ECHO} "MAKE:            ${MAKE}"
-    ${ECHO} "MKDIR:           ${MKDIR}"
+    # ${ECHO} "MAKE:            ${MAKE}"
+    # ${ECHO} "MKDIR:           ${MKDIR}"
     ${ECHO} "OS:              ${OS}"
     ${ECHO} "PKG_CONFIG_PATH: ${PKG_CONFIG_PATH}"
     ${ECHO} "PREFIX_DIR:      ${PREFIX_DIR}"
-    ${ECHO} "PS:              ${PS}"
-    ${ECHO} "READLINK:        ${READLINK}"
     ${ECHO} "SCRIPT_NAME:     ${SCRIPT_NAME}"
-    ${ECHO} "TAR:             ${TAR}"
-    ${ECHO} "WGET:            ${WGET}"
+    # ${ECHO} "TAR:             ${TAR}"
+    # ${ECHO} "WGET:            ${WGET}"
 }
 
 setup() {
