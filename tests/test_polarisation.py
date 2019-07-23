@@ -7,7 +7,6 @@ import unittest
 
 from collections import namedtuple
 from gi.repository import GLib
-from gi.repository import GLib
 import gi
 gi.require_version("Hkl", "5.0")
 from gi.repository import Hkl
