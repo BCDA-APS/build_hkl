@@ -3,8 +3,14 @@
 # build the hkl package from source
 
 # must be absolute paths!
-export PREFIX_DIR=/APSshare/linux/64/hkl-5
-export PREFIX_DIR=${HOME}/Apps/hkl-5
+if [ -d "/APSshare/linux/64" ]; then
+    export PREFIX_DIR=/APSshare/linux/64/hkl-5
+elif [ -d "${HOME}/Apps" ]; then
+    export PREFIX_DIR=${HOME}/Apps/hkl-5
+else
+    echo "Cannot find directory ${HOME}/Apps/; exiting ..."
+    exit 1
+fi
 export BUILD_DIR=/tmp/hkl_source_build
 
 # build with a very primitive PATH
