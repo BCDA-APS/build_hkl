@@ -5,6 +5,8 @@ to download, build, install, and test the
 [*hkl*](https://people.debian.org/~picca/hkl/hkl.html) package 
 (source code: https://repo.or.cz/hkl.git).
 
+*hkl* Documentation: https://people.debian.org/~picca/hkl/hkl.html
+
 In this file, edit BUILD_DIR to specify where the source code
 will be stored and built.  Edit PREFIX_DIR to specify where 
 build products (executable, libraries, configuration files, ...)
