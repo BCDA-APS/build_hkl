@@ -2,3 +2,4 @@
 src/
 *.log
 *.ipynb
+.vscode/
