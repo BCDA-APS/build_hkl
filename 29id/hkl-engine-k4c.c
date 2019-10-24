@@ -511,6 +511,20 @@ static HklEngine *hkl_engine_k4ch_hkl_new(HklEngineList *engines)
 	return self;
 }
 
+static HklEngine *hkl_engine_k4ch_psi_new(HklEngineList *engines)
+{
+	HklEngine *self;
+	HklMode *default_mode;
+
+	self = hkl_engine_psi_new(engines);
+
+	default_mode = psi();
+	hkl_engine_add_mode(self, default_mode);
+	hkl_engine_mode_set(self, default_mode);
+
+	return self;
+}
+
 REGISTER_READONLY_INCIDENCE(hkl_engine_kappa4C_horizontal_incidence_new,
 			    P99_PROTECT({KOMEGA, KAPPA, KPHI}),
 			    surface_parameters_y);
