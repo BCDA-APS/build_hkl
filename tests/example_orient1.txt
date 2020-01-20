@@ -1,0 +1,37 @@
+Pull out the diffractometer geometry and parts that define the orientation matrix from this spec data.
+
+First six motors are consistent with (sixc?) geometry but other motors (33ide:*) suggest the geometry used in APS 33-ID-E.
+Finally, this 6 motor set is a unique match to *sixc* ('motors': ['del', 'th', 'chi', 'phi', 'mu', 'gam'])
+Test this by number of parameters in the G array
+
+Compare Q and O0/P0 for a specific solution to test the UB matrix
+
+sample: JL124_1
+crystal:  3.905 3.905 3.905 90 90 90
+geometry: sixc
+mode: 12 (Z-Axis with Azimuth fixed and Chi, Phi set to -Sigma, -Tau)
+lambda: 0.8265616267
+r1: (0, 0, 2) 0.003 90 0.5799999712 239.9999477 12.102 12.9945
+r2: (3, 0, 3) 47.18 90 0.5799999712 239.9999477 21.77425 15.7375
+Q: (2.99804, 0.00216068, 2.99661) 47.14125 90.089 0.58 239.94275 21.73025 15.7375
+UB: 1.207702707 1.248454819 0.002095582696 
+    -1.485612421 0.9118074731 0.003241829804 
+    -0.0173752388 0.02282507942 1.651530555
+
+#F /.../JL124_1.spc
+#O0    Delta     Theta       Chi       Phi        Mu     Gamma  wh-slit top  wh-slit left
+#O1 wh-slit bottom  wh-slit right  DCM theta   Motor 5   Motor 6   Motor 7   Motor 8   Motor 9
+#O2 Motor 10  Motor 11  Motor 12  Motor 13  Motor 14  Motor 15  mono-sl top  mono-sl left
+#O3 mono-sl bottom  mono-sl right  GammaScrew    baffle   Table X  Table Y1  Table Y2  Table Y3
+#O4 33ide:m58:c1:m5  33ide:m58:c1:m6  33ide:m58:c1:m7  33ide:m58:c1:m8  ion_ch_vert  
+#G0 12 0 1 -0.002814275157 0.007740448308 0.9999660821 0 0 0 0 0 0 600 0 1 1 143.6
+#G1 3.905 3.905 3.905 90 90 90 1.609010322 1.609010322 1.609010322 90 90 90 0 0 2 3 0 3 0.003 90 0.5799999712 239.9999477 12.102 12.9945 47.18 90 0.5799999712 239.9999477 21.77425 15.7375 0.8265616267 0.8265616267
+#G3 1.207702707 1.248454819 0.002095582696 -1.485612421 0.9118074731 0.003241829804 -0.0173752388 0.02282507942 1.651530555
+#G4 2.998037021 0.002160676878 2.996606618 0.8265616267 21.73024942 15.73707597 66.518375 59.48580986 -94.28612051 -0.5799999712 -239.9999477 0 0 0 -92.49362136 0 0 0 0 0 0 -180 -180 -180 -180 -180 -180 0
+#Q 2.99804 0.00216068 2.99661
+#P0 47.14125 90.089 0.58 239.94275 21.73025 15.7375 0.8000406 1.2
+#P1 0.79996698 0.49999998 7.5737788 0 0 0 0 0
+#P2 0 0 0 0 0 0 4.9999698 2.4999625
+#P3 -0.10019175 2.5002594 163.5625 34.92 -2.55002 -87.37856 -101.46268 -70.889
+#P4 87.99997 2.1800002 92.08 -0.00159 12.55028 
+#U DCM_energy 14.9994
